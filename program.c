@@ -89,44 +89,113 @@ double ** gen_random_matrix(int dim1, int dim2)
 void check_result(double ** result, double ** control, int dim1, int dim2)
 {
   int i, j;
-  double sum_abs_diff = 0.0;
-  const double EPSILON = 0.0625;
+  int error = 0;
 
   for ( i = 0; i < dim1; i++ ) {
     for ( j = 0; j < dim2; j++ ) {
-      double diff = abs(control[i][j] - result[i][j]);
-      sum_abs_diff = sum_abs_diff + diff;
+	if(control[i][j] != result[i][j]){
+		error = 1;
+	}
     }
   }
 
-  if ( sum_abs_diff > EPSILON ) {
-    fprintf(stderr, "WARNING: sum of absolute differences (%f) > EPSILON (%f)\n",
-	    sum_abs_diff, EPSILON);
-  }
+	if(error){
+		printf("Matrices do not match\n");
+	}
+
 }
 
 /* multiply matrix A times matrix B and put result in matrix C */
 void matmul(double ** A, double ** B, double ** C, int a_dim1, int a_dim2, int b_dim2)
 {
-  int i, j, k;
+	int i, j, k;
 
-  for ( i = 0; i < a_dim1; i++ ) {
-    for( j = 0; j < b_dim2; j++ ) {
-      double sum = 0.0;
-      for ( k = 0; k < a_dim2; k++ ) {
-	sum += A[i][k] * B[k][j];
-      }
-      C[i][j] = sum;
-    }
-  }
+	for(i = 0; i < a_dim1; i++) {
+		for( j = 0; j < b_dim2; j++ ) {
+			double sum = 0.0;
+				for(k = 0; k < a_dim2; k++) {
+					sum += A[i][k] * B[k][j];
+				}
+			C[i][j] = sum;
+		}
+	}
+
+}
+
+/* transposing the second matrix can speed up multiplication - see report */
+double** transpose(double ** B, int a_dim2, int b_dim2){
+
+        double ** trB = new_empty_matrix(b_dim2, a_dim2);
+        int i, j;
+
+        for(i = 0; i < a_dim2; i++){
+                for(j = 0; j < b_dim2; j++){
+                        trB[j][i] = B[i][j];
+                }
+        }
+
+        return trB;
+
 }
 
 /* the fast version of matmul written by the team */
-void team_matmul(double ** A, double ** B, double ** C, int a_dim1, int a_dim2, int b_dim2)
-{
-  // this call here is just dummy code
-  // insert your own code instead
-  matmul(A, B, C, a_dim1, a_dim2, b_dim2);
+void team_matmul(double ** A, double ** B, double ** C, int a_dim_1, int a_dim_2, int b_dim_2){
+
+	/* create local copies to allow them to be stored in registers */
+	int a_dim1 = a_dim_1;
+	int a_dim2 = a_dim_2;
+	int b_dim2 = b_dim_2;
+
+	if((a_dim1 >= 159 || a_dim2 >= 159 || b_dim2 >= 159) && (a_dim2 / a_dim1 < 22 || a_dim2 / b_dim2 < 22)){
+
+		/* transposing the second matrix allows more of it to be in the cache - see report for details */
+		B = transpose(B, a_dim2, b_dim2);
+
+		int i;
+		#pragma omp parallel for
+		for(i = 0; i < a_dim1; i++){
+
+			int j, k;
+			double sum0;
+
+			for(j = 0; j < b_dim2; j++){
+
+				sum0 = 0;
+
+				for(k = 0; k < a_dim2; k++) {
+					/* need to use B[j][k] instead of B[k][j] to account for the fact that the matrix is transposed */
+					sum0 += A[i][k] * B[j][k];
+				}
+
+				C[i][j] = sum0;
+
+			}
+
+		}
+
+	}else{
+
+		int i, j, k;
+		double sum0;
+
+		for(i = 0; i < a_dim1; i++){
+
+			for(j = 0; j < b_dim2; j++){
+
+				sum0 = 0;
+
+				for(k = 0; k < a_dim2; k++) {
+					sum0 += A[i][k] * B[k][j];
+				}
+
+				C[i][j] = sum0;
+
+			}
+
+		}
+
+	}
+
 }
 
 int main(int argc, char ** argv)
@@ -163,11 +232,19 @@ int main(int argc, char ** argv)
   C = new_empty_matrix(a_dim1, b_dim2);
   control_matrix = new_empty_matrix(a_dim1, b_dim2);
 
-  DEBUGGING(write_out(A, a_dim1, a_dim2));
+  /* record starting time */
+  gettimeofday(&start_time, NULL);
 
   /* use a simple matmul routine to produce control result */
   matmul(A, B, control_matrix, a_dim1, a_dim2, b_dim2);
 
+  /* record finishing time */
+  gettimeofday(&stop_time, NULL);
+  mul_time = (stop_time.tv_sec - start_time.tv_sec) * 1000000L +
+    (stop_time.tv_usec - start_time.tv_usec);
+  printf("Matmul time (original): %lld microseconds\n", mul_time);
+
+  //write_out(control_matrix, a_dim1, b_dim2);
   /* record starting time */
   gettimeofday(&start_time, NULL);
 
@@ -178,9 +255,9 @@ int main(int argc, char ** argv)
   gettimeofday(&stop_time, NULL);
   mul_time = (stop_time.tv_sec - start_time.tv_sec) * 1000000L +
     (stop_time.tv_usec - start_time.tv_usec);
-  printf("Matmul time: %lld microseconds\n", mul_time);
+  printf("Matmul time (optimised): %lld microseconds\n", mul_time);
 
-  DEBUGGING(write_out(C, a_dim1, b_dim2));
+  //write_out(C, a_dim1, b_dim2);
 
   /* now check that the team's matmul routine gives the same answer
      as the known working version */
