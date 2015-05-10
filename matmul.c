@@ -10,7 +10,7 @@ double ** createEmptyMatrix(int dimOne, int dimTwo){
 	double * new_matrix = malloc(sizeof(double) * dimOne * dimTwo);
 	
 	int i;
-	for ( i = 0; i < dimOne; i++ ) {
+	for(i = 0; i < dimOne; i++) {
 		result[i] = &(new_matrix[i*dimTwo]);
 	}
 
