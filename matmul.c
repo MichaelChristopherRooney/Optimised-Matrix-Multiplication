@@ -18,6 +18,7 @@ double ** createEmptyMatrix(int dimOne, int dimTwo){
 
 }
 
+/* create a new matrix and fill it with random values */
 double ** generateRandomMatrix(int dimOne, int dimTwo){
 
 	double ** temp = createEmptyMatrix(dimOne, dimTwo);
@@ -28,7 +29,6 @@ double ** generateRandomMatrix(int dimOne, int dimTwo){
 	for(i = 0; i < dimOne; i++){
 		for(n = 0; n < dimTwo; n++){
 			temp[i][n] = random();
-			//printf("%f\n", temp[i][n]);
 		}
 	}
 
@@ -36,6 +36,7 @@ double ** generateRandomMatrix(int dimOne, int dimTwo){
 
 }
 
+/* multiply matrices with no optimisations */
 void multiplyMatices(double ** A, double ** B, double ** result, int aDim, int sharedDim, int bDim){
 
 	int i, j, k;
@@ -54,6 +55,7 @@ void multiplyMatices(double ** A, double ** B, double ** result, int aDim, int s
 
 }
 
+/* transpose a matrix to optimise cache usage - see README for details */
 double ** transpose(double ** p, int dimOne, int dimTwo){
 
 	double ** t = createEmptyMatrix(dimTwo, dimOne);
@@ -69,52 +71,7 @@ double ** transpose(double ** p, int dimOne, int dimTwo){
 
 }
 
-void multiplyMatricesTransposeOnly(double ** A, double ** pB, double ** result, int aDim, int sharedDim, int bDim){
-
-	// new matrix is created here to avoid changing B in the main function
-	double ** B = transpose(pB, sharedDim, bDim);
-
-	int i;
-	for(i = 0; i < aDim; i++){
-
-		int j, k;
-		for(j = 0; j < bDim; j++){
-
-			double sum = 0.0;
-			for(k = 0; k < sharedDim; k++){
-				sum += A[i][k] * B[j][k];
-			}
-
-			result[i][j] = sum;
-
-		}
-
-	}
-
-}
-
-void multiplyMatricesThreadedOnly(double ** A, double ** B, double ** result, int aDim, int sharedDim, int bDim){
-
-	int i;
-	#pragma omp parallel for
-	for(i = 0; i < aDim; i++){
-
-		int j, k;
-		for(j = 0; j < bDim; j++){
-
-			double sum = 0.0;
-			for(k = 0; k < sharedDim; k++){
-				sum += A[i][k] * B[k][j];
-			}
-
-			result[i][j] = sum;
-
-		}
-
-	}
-
-}
-
+/* multiply matrices using OpenMP and transposing */
 void multiplyMatricesOptimised(double ** A, double ** B, double ** result, int aDim, int sharedDim, int bDim){
 
 	B = transpose(B, sharedDim, bDim);
@@ -128,7 +85,8 @@ void multiplyMatricesOptimised(double ** A, double ** B, double ** result, int a
 
 			double sum = 0.0;
 			for(k = 0; k < sharedDim; k++){
-				sum += A[i][k] * B[j][k];
+				// B[j][k] instead of B[k][j] as B has been transposed
+				sum += A[i][k] * B[j][k]; 
 			}
 
 			result[i][j] = sum;
@@ -139,6 +97,7 @@ void multiplyMatricesOptimised(double ** A, double ** B, double ** result, int a
 
 }	
 
+/* make the sure the result from the optimised multiplication matches the control */
 void checkResults(double ** rOne, double ** rTwo, int dimOne, int dimTwo){
 
 	int i, j;
@@ -204,6 +163,6 @@ int main(int argc, char** argv){
 	checkResults(originalResult, optimisedResult, aDimOne, bDimTwo);
 
 	printf("Unoptimised multiplication took: %lld microseconds\n", originalTime / 10);
-	printf("Unoptimised multiplication took: %lld microseconds\n", optimisedTime / 10);
+	printf("Optimised multiplication took: %lld microseconds\n", optimisedTime / 10);
 
 }
