@@ -12,7 +12,7 @@ The dimensions of the matrices are passed as arguments to the program, in the fo
 
 #Timings
 
-Timed using an Intel i5 2500k CPU.
+Timed using an Intel i5 2500k CPU (http://ark.intel.com/products/52210/Intel-Core-i5-2500K-Processor-6M-Cache-up-to-3_70-GHz) with turbo frequency disabled to ensure fair timing.
 
 
 Each category was run 10 times and the given result is an average of the timings.
