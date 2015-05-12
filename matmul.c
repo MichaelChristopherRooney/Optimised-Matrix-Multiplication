@@ -162,7 +162,7 @@ int main(int argc, char** argv){
 
 	checkResults(originalResult, optimisedResult, aDimOne, bDimTwo);
 
-	printf("Unoptimised multiplication took: %lld microseconds\n", originalTime / 10);
-	printf("Optimised multiplication took: %lld microseconds\n", optimisedTime / 10);
+	printf("Unoptimised multiplication took: %lld microseconds\n", originalTime);
+	printf("Optimised multiplication took: %lld microseconds\n", optimisedTime);
 
 }
