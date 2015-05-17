@@ -24,10 +24,10 @@ In all categories two 1000x1000 matrices were multiplied.
 Compiled with "gcc -fopenmp matmul.c"
 
 
-	Normal matrix multiplication: 10.31 seconds
-	Matrix multiplication using a transposed matrix: 3.53 seconds
-	Matrix multiplication with OpenMP: 2.91 seconds
-	Matrix multiplication using OpenMP and a transposed Matrix: 1.13 seconds
+	Normal: 10.31 seconds
+	Using a transposed matrix: 3.53 seconds
+	Using OpenMP: 2.91 seconds
+	Using OpenMP and a transposed matrix: 1.13 seconds
 
 
 These numbers show that using OpenMP and transposing results a program that on average runs 9.1x faster
