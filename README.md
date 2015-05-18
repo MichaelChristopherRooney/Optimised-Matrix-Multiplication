@@ -26,7 +26,7 @@ Compiled with "gcc -fopenmp matmul.c"
 	Using a transposed matrix: 3.53 seconds
 	Using OpenMP: 2.91 seconds
 	Using OpenMP and a transposed matrix: 1.13 seconds
-	Using OpenMP,a transposed matrix and loop unrolling: 0.93 seconds
+	Using OpenMP, a transposed matrix and loop unrolling: 0.93 seconds
 
 These numbers show that the optimised version on average runs 11x faster.
 
