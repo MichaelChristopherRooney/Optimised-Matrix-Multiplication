@@ -4,7 +4,7 @@
 A program to speed up matrix multiplication.
 
 
-Uses OpenMP to compute results in parallel, loop unrolling to reduce overhead and transposing to optimise cache usage (see http://www.akkadia.org/drepper/cpumemory.pdf Section 6.2.1)
+Uses OpenMP to compute results in parallel, loop unrolling to reduce overhead and pipeline flushes and transposing to optimise cache usage (see http://www.akkadia.org/drepper/cpumemory.pdf Section 6.2.1)
 
 
 The dimensions of the matrices are passed as arguments to the program, in the form: "./matmul -A rows -A cols -B rows -B cols"
