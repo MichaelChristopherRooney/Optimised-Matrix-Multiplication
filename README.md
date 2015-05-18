@@ -12,14 +12,12 @@ The dimensions of the matrices are passed as arguments to the program, in the fo
 
 #Timings
 
-Timed using an Intel i5 2500k CPU (http://ark.intel.com/products/52210/Intel-Core-i5-2500K-Processor-6M-Cache-up-to-3_70-GHz) with turbo frequency disabled to ensure fair timing.
+This was program was timed on two machines. Several categories were timed to measure how much each optimisation decreased the time taken. Each category was run 10 times and the given result is an average of the timings. In all categories two 1000x1000 matrices were multiplied. 
 
+The program was compiled with 
+"gcc -fopenmp matmul.c"
 
-Each category was run 10 times and the given result is an average of the timings.
-
-In all categories two 1000x1000 matrices were multiplied.
-
-Compiled with "gcc -fopenmp matmul.c"
+Using an Intel i5 2500k CPU (http://ark.intel.com/products/52210/Intel-Core-i5-2500K-Processor-6M-Cache-up-to-3_70-GHz) with turbo frequency disabled to ensure fair timing.
 
 	Normal: 10.31 seconds
 	Using loop unrolling: 9.6 seconds
@@ -28,7 +26,15 @@ Compiled with "gcc -fopenmp matmul.c"
 	Using OpenMP and a transposed matrix: 1.13 seconds
 	Using OpenMP, a transposed matrix and loop unrolling: 0.93 seconds
 
-These numbers show that the optimised version on average runs 11x faster.
+Using an AMD 64 core CPU
+
+	Normal: 11.938 seconds
+	Using OpenMP: 0.461 seconds
+	Using OpenMP and a transposed matrix: 0.087 seconds
+	
+On the AMD 64 core CPU, OpenMP and transposing result in a 137x speedup. On the Intel 4 core CPU, OpenMP, transposing and loop unrolling results in a 11x speedup. Clearly this type of program benefits massively from having work done concurrently.
+
+Note that I no longer had access to the 64 core machine when I added in loop unrolling, so I was unable to get timings for it.
 
 #Issues
 
