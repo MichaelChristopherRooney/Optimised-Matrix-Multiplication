@@ -1,4 +1,4 @@
-#About
+# About
 
 
 A program to speed up matrix multiplication.
@@ -10,7 +10,7 @@ Uses OpenMP to compute results in parallel, loop unrolling to reduce overhead an
 The dimensions of the matrices are passed as arguments to the program, in the form: "./matmul -A rows -A cols -B rows -B cols"
 
 
-#Timings
+# Timings
 
 This was program was timed on two machines. Several categories were timed to measure how much each optimisation decreased the time taken. Each category was run 10 times and the given result is an average of the timings. In all categories two 1000x1000 matrices were multiplied. 
 
@@ -36,7 +36,7 @@ On the AMD 64 core CPU, OpenMP and transposing resulted in a 137x speedup. On th
 
 Note that I no longer had access to the 64 core machine when I added in loop unrolling, so I was unable to get timings for it.
 
-#Issues
+# Issues
 
 The optimised function will be slower than the unoptimised function when dealing with very small matrices.
 
